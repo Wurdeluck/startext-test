@@ -1,0 +1,67 @@
+package com.example.demo.controllers;
+
+import com.example.demo.exceptions.ResourceNotFoundException;
+import com.example.demo.models.Artefact;
+import com.example.demo.repository.ArtefactRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+
+
+@RestController
+@RequestMapping("/api/v1")
+public class ArtefactController {
+    @Autowired
+    private ArtefactRepository artefactRepository;
+
+    @GetMapping("/artefacts")
+    public List <Artefact> getAllArtefacts() {
+        return artefactRepository.findAll();
+    }
+
+    @GetMapping("/artefacts/{id}")
+    public ResponseEntity < Artefact > getArtefactById(@PathVariable(value = "id") UUID artefactId)
+            throws ResourceNotFoundException {
+        Artefact artefact = artefactRepository.findById(artefactId)
+                .orElseThrow(() -> new ResourceNotFoundException("Artefact not found for this id :: " + artefactId));
+        return ResponseEntity.ok().body(artefact);
+    }
+
+    @PostMapping("/artefacts")
+    public Artefact  createArtefact(@Valid @RequestBody Artefact artefact) {
+        return artefactRepository.save(artefact);
+    }
+
+    @PutMapping("/artefacts/{id}")
+    public ResponseEntity < Artefact > updateArtefact(@PathVariable(value = "id") UUID artefactId,
+                                                      @Valid @RequestBody Artefact artefactDetails) throws ResourceNotFoundException {
+        Artefact artefact = artefactRepository.findById(artefactId)
+                .orElseThrow(() -> new ResourceNotFoundException("Artefact not found for this id :: " + artefactId));
+
+        artefact.setCreated(artefactDetails.getCreated());
+        artefact.setUserId(artefactDetails.getUserId());
+        artefact.setCategory(artefactDetails.getCategory());
+        artefact.setDescription(artefactDetails.getDescription());
+        final Artefact updatedArtefact = artefactRepository.save(artefact);
+        return ResponseEntity.ok(updatedArtefact);
+    }
+
+    @DeleteMapping("/artefacts/{id}")
+    public Map < String, Boolean > deleteArtefact(@PathVariable(value = "id") UUID artefactId)
+            throws ResourceNotFoundException {
+        Artefact artefact = artefactRepository.findById(artefactId)
+                .orElseThrow(() -> new ResourceNotFoundException("Artefact not found for this id :: " + artefactId));
+
+        artefactRepository.delete(artefact);
+        Map < String, Boolean > response = new HashMap < > ();
+        response.put("deleted", Boolean.TRUE);
+        return response;
+    }
+}
