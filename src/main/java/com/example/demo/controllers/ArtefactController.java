@@ -8,26 +8,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+import java.util.*;
 
 
 @RestController
 @RequestMapping("/api/v1")
 public class ArtefactController {
+
     @Autowired
     private ArtefactRepository artefactRepository;
 
+
     @GetMapping("/artefacts")
-    public List <Artefact> getAllArtefacts() {
+    public List<Artefact> getAllArtefacts() {
         return artefactRepository.findAll();
     }
 
     @GetMapping("/artefacts/{id}")
-    public ResponseEntity < Artefact > getArtefactById(@PathVariable(value = "id") UUID artefactId)
+    public ResponseEntity<Artefact> getArtefactById(@PathVariable(value = "id") UUID artefactId)
             throws ResourceNotFoundException {
         Artefact artefact = artefactRepository.findById(artefactId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artefact not found for this id :: " + artefactId));
@@ -35,13 +33,14 @@ public class ArtefactController {
     }
 
     @PostMapping("/artefacts")
-    public Artefact  createArtefact(@Valid @RequestBody Artefact artefact) {
+    public Artefact createArtefact(@Valid @RequestBody Artefact artefact) {
         return artefactRepository.save(artefact);
     }
 
     @PutMapping("/artefacts/{id}")
-    public ResponseEntity < Artefact > updateArtefact(@PathVariable(value = "id") UUID artefactId,
-                                                      @Valid @RequestBody Artefact artefactDetails) throws ResourceNotFoundException {
+    public ResponseEntity<Artefact> updateArtefact(
+            @PathVariable(value = "id") UUID artefactId,
+            @Valid @RequestBody Artefact artefactDetails) throws ResourceNotFoundException {
         Artefact artefact = artefactRepository.findById(artefactId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artefact not found for this id :: " + artefactId));
 
@@ -49,18 +48,19 @@ public class ArtefactController {
         artefact.setUserId(artefactDetails.getUserId());
         artefact.setCategory(artefactDetails.getCategory());
         artefact.setDescription(artefactDetails.getDescription());
+//        artefact.setLastModifiedDate(new Date());
         final Artefact updatedArtefact = artefactRepository.save(artefact);
         return ResponseEntity.ok(updatedArtefact);
     }
 
     @DeleteMapping("/artefacts/{id}")
-    public Map < String, Boolean > deleteArtefact(@PathVariable(value = "id") UUID artefactId)
-            throws ResourceNotFoundException {
+    public Map<String, Boolean> deleteArtefact(
+            @PathVariable(value = "id") UUID artefactId) throws ResourceNotFoundException {
         Artefact artefact = artefactRepository.findById(artefactId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artefact not found for this id :: " + artefactId));
 
         artefactRepository.delete(artefact);
-        Map < String, Boolean > response = new HashMap < > ();
+        Map<String, Boolean> response = new HashMap<>();
         response.put("deleted", Boolean.TRUE);
         return response;
     }

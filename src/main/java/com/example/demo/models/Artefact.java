@@ -1,21 +1,37 @@
 package com.example.demo.models;
+// This import helps create tables in database
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
 
+import static javax.persistence.TemporalType.TIMESTAMP;
+
+// The Artefact class is annotated with @Entity, indicating that it is a JPA entity.
+// @Table annotation exists, this entity is mapped to a table named artefacts.
 @Entity
 @Table(name = "artefacts")
+@EntityListeners(AuditingEntityListener.class)
+//public class Artefact extends Auditable<String> {
 public class Artefact {
 
+    @Id
+//    @NotNull
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID artefactId;
+    @CreatedDate
+    @Temporal(TIMESTAMP)
     private Date created;
     private String userId;
     private String category;
     private String description;
 
-    public Artefact() {
+
+    //  The default constructor exists only for the sake of JPA. You do not use it directly, so it is designated as protected
+    protected Artefact() {
 
     }
 
@@ -27,9 +43,7 @@ public class Artefact {
         this.description = description;
     }
 
-    @Id
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     public UUID getArtefactId() {
         return artefactId;
     }
