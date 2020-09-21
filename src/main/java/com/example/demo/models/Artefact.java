@@ -5,7 +5,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static javax.persistence.TemporalType.TIMESTAMP;
@@ -17,21 +19,32 @@ import static javax.persistence.TemporalType.TIMESTAMP;
 @EntityListeners(AuditingEntityListener.class)
 //public class Artefact extends Auditable<String> {
 public class Artefact {
-
     @Id
-//    @NotNull
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID artefactId;
+
     @CreatedDate
     @Temporal(TIMESTAMP)
+    @Column(name = "created", nullable = false)
     private Date created;
+
+    @Column(name = "userId", nullable = false)
     private String userId;
+
+    @Column(name = "category", nullable = false)
     private String category;
+
+    @Column(name = "description", nullable = false)
     private String description;
+
+    //    @OneToMany(mappedBy = "artefact", fetch=FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "artefactId", referencedColumnName = "artefactId")
+    private List<Commentary> commentaries = new ArrayList<>();
 
 
     //  The default constructor exists only for the sake of JPA. You do not use it directly, so it is designated as protected
-    protected Artefact() {
+    public Artefact() {
 
     }
 
@@ -43,7 +56,6 @@ public class Artefact {
         this.description = description;
     }
 
-
     public UUID getArtefactId() {
         return artefactId;
     }
@@ -52,7 +64,6 @@ public class Artefact {
         this.artefactId = id;
     }
 
-    @Column(name = "created", nullable = false)
     public Date getCreated() {
         return created;
     }
@@ -61,7 +72,6 @@ public class Artefact {
         this.created = created;
     }
 
-    @Column(name = "userId", nullable = false)
     public String getUserId() {
         return userId;
     }
@@ -70,7 +80,6 @@ public class Artefact {
         this.userId = userId;
     }
 
-    @Column(name = "category", nullable = false)
     public String getCategory() {
         return category;
     }
@@ -79,7 +88,6 @@ public class Artefact {
         this.category = category;
     }
 
-    @Column(name = "description", nullable = false)
     public String getDescription() {
         return description;
     }
@@ -87,4 +95,13 @@ public class Artefact {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public List < Commentary > getCommentaries() {
+        return commentaries;
+    }
+
+    public void setCommentaries(List < Commentary > commentaries) {
+        this.commentaries = commentaries;
+    }
+
 }

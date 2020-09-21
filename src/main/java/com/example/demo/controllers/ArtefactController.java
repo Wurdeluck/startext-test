@@ -2,13 +2,17 @@ package com.example.demo.controllers;
 
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.models.Artefact;
+import com.example.demo.models.Commentary;
 import com.example.demo.repository.ArtefactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 
 @RestController
@@ -22,6 +26,14 @@ public class ArtefactController {
     @GetMapping("/artefacts")
     public List<Artefact> getAllArtefacts() {
         return artefactRepository.findAll();
+    }
+
+    @GetMapping("/artefacts/{id}/commentaries")
+    public ResponseEntity<List<Commentary>> getCommentariesByArtefactId(@PathVariable(value = "id") UUID artefactId)
+            throws ResourceNotFoundException {
+        Artefact artefact = artefactRepository.findById(artefactId)
+                .orElseThrow(() -> new ResourceNotFoundException("Commentaries not found for this id :: " + artefactId));
+        return ResponseEntity.ok().body(artefact.getCommentaries());
     }
 
     @GetMapping("/artefacts/{id}")
