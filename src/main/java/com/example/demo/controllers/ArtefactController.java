@@ -5,12 +5,13 @@ import com.example.demo.models.Artefact;
 import com.example.demo.models.Commentary;
 import com.example.demo.repository.ArtefactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,16 +25,16 @@ public class ArtefactController {
 
 
     @GetMapping("/artefacts")
-    public List<Artefact> getAllArtefacts() {
-        return artefactRepository.findAll();
+    public Page<Artefact> getAllArtefacts(Pageable pageable) {
+        return artefactRepository.findAll(pageable);
     }
 
     @GetMapping("/artefacts/{id}/commentaries")
-    public ResponseEntity<List<Commentary>> getCommentariesByArtefactId(@PathVariable(value = "id") UUID artefactId)
+    public ResponseEntity<Page<Commentary>> getCommentariesByArtefactId(@PathVariable(value = "id") UUID artefactId, Pageable pageable)
             throws ResourceNotFoundException {
         Artefact artefact = artefactRepository.findById(artefactId)
                 .orElseThrow(() -> new ResourceNotFoundException("Commentaries not found for this id :: " + artefactId));
-        return ResponseEntity.ok().body(artefact.getCommentaries());
+        return ResponseEntity.ok().body(artefact.getCommentaries(pageable));
     }
 
     @GetMapping("/artefacts/{id}")

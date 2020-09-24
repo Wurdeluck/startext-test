@@ -2,6 +2,9 @@ package com.example.demo.models;
 // This import helps create tables in database
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -96,8 +99,13 @@ public class Artefact {
         this.description = description;
     }
 
-    public List < Commentary > getCommentaries() {
-        return commentaries;
+    public Page< Commentary > getCommentaries(Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = (Math.min((start + pageable.getPageSize()), commentaries.size()));
+        Page<Commentary> page
+                = new PageImpl<Commentary>(commentaries.subList(start, end), pageable, commentaries.size());
+        return page;
+//        return commentaries;
     }
 
     public void setCommentaries(List < Commentary > commentaries) {
