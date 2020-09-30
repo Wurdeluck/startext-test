@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -47,6 +48,15 @@ public class ArtefactController {
 
     @PostMapping("/artefacts")
     public Artefact createArtefact(@Valid @RequestBody Artefact artefact) {
+        if (artefact.getCreated() == null) {
+            Date date = new Date();
+            artefact.setCreated(date);
+        }
+//        bad idea( I can't check if this UUID is already in database
+        if (artefact.getArtefactId() == null) {
+            UUID artefactId = UUID.randomUUID();
+            artefact.setArtefactId(artefactId);
+        }
         return artefactRepository.save(artefact);
     }
 

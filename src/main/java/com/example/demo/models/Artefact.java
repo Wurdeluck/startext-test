@@ -5,7 +5,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -19,11 +18,12 @@ import static javax.persistence.TemporalType.TIMESTAMP;
 // @Table annotation exists, this entity is mapped to a table named artefacts.
 @Entity
 @Table(name = "artefacts")
-@EntityListeners(AuditingEntityListener.class)
+//@EntityListeners(AuditingEntityListener.class)
 //public class Artefact extends Auditable<String> {
 public class Artefact {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+//    This should be uncommented, but now for testing purposes
+//    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID artefactId;
 
     @CreatedDate
@@ -105,7 +105,6 @@ public class Artefact {
         Page<Commentary> page
                 = new PageImpl<Commentary>(commentaries.subList(start, end), pageable, commentaries.size());
         return page;
-//        return commentaries;
     }
 
     public void setCommentaries(List < Commentary > commentaries) {

@@ -24,6 +24,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.hibernate.validator:hibernate-validator'
+    implementation 'junit:junit:4.12'
 //    runtimeOnly 'com.h2database:h2'
     compile("com.h2database:h2")
 
@@ -32,6 +33,7 @@ dependencies {
     }
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.security:spring-security-test'
+//    testImplementation 'junit:junit:4.12'
 
 }
 
