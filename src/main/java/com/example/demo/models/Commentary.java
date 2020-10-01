@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class Commentary {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+//    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID commentaryId;
 
     @Column(name = "userId", nullable = false)
@@ -37,6 +37,9 @@ public class Commentary {
     }
 
     public UUID getCommentaryId() {
+        if (commentaryId == null) {
+            commentaryId = UUID.randomUUID();
+        }
         return commentaryId;
     }
 

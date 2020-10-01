@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityExistsException;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +70,11 @@ public class CommentaryController {
 
     @PostMapping("/commentaries")
     @ResponseStatus(HttpStatus.CREATED)
-    public Commentary createCommentary(@Valid @RequestBody Commentary commentary) {
+    public Commentary createCommentary(@Valid @RequestBody Commentary commentary) throws EntityExistsException {
+        UUID commentaryId = commentary.getCommentaryId();
+        if (commentaryRepository.existsByCommentaryId(commentaryId)) {
+            throw new EntityExistsException("Commentary with this id already exists in database :: "+ commentaryId);
+        }
         return commentaryRepository.save(commentary);
     }
 
@@ -79,9 +84,9 @@ public class CommentaryController {
             @Valid @RequestBody Commentary commentaryDetails) throws ResourceNotFoundException {
         Commentary commentary = commentaryRepository.findById(commentaryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Commentary not found for this id :: " + commentaryId));
-        commentary.setUserId(commentaryDetails.getUserId());
+//        commentary.setUserId(commentaryDetails.getUserId());
         commentary.setContent(commentaryDetails.getContent());
-        commentary.setArtefactId(commentaryDetails.getArtefactId());
+//        commentary.setArtefactId(commentaryDetails.getArtefactId());
         final Commentary updatedCommentary = commentaryRepository.save(commentary);
         return ResponseEntity.ok().body(updatedCommentary);
     }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityExistsException;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class ArtefactController {
     public ResponseEntity<Page<Commentary>> getCommentariesByArtefactId(@PathVariable(value = "id") UUID artefactId, Pageable pageable)
             throws ResourceNotFoundException {
         Artefact artefact = artefactRepository.findById(artefactId)
-                .orElseThrow(() -> new ResourceNotFoundException("Commentaries not found for this id :: " + artefactId));
+                .orElseThrow(() -> new ResourceNotFoundException("Commentaries not found. Artefact does not exist for this id :: " + artefactId));
         return ResponseEntity.ok().body(artefact.getCommentaries(pageable));
     }
 
@@ -47,16 +48,13 @@ public class ArtefactController {
     }
 
     @PostMapping("/artefacts")
-    public Artefact createArtefact(@Valid @RequestBody Artefact artefact) {
-        if (artefact.getCreated() == null) {
-            Date date = new Date();
-            artefact.setCreated(date);
+    public Artefact createArtefact(@Valid @RequestBody Artefact artefact) throws EntityExistsException {
+        UUID artefactId = artefact.getArtefactId();
+        artefact.setCreated(new Date());
+        if (artefactRepository.existsByArtefactId(artefactId)) {
+            throw new EntityExistsException("Artefact with this id already exists in database :: "+ artefactId);
         }
-//        bad idea( I can't check if this UUID is already in database
-        if (artefact.getArtefactId() == null) {
-            UUID artefactId = UUID.randomUUID();
-            artefact.setArtefactId(artefactId);
-        }
+
         return artefactRepository.save(artefact);
     }
 
@@ -66,12 +64,11 @@ public class ArtefactController {
             @Valid @RequestBody Artefact artefactDetails) throws ResourceNotFoundException {
         Artefact artefact = artefactRepository.findById(artefactId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artefact not found for this id :: " + artefactId));
-
-        artefact.setCreated(artefactDetails.getCreated());
-        artefact.setUserId(artefactDetails.getUserId());
+//        artefact.setArtefactId(artefactDetails.getArtefactId());
+//        artefact.setCreated(artefactDetails.getCreated());
+//        artefact.setUserId(artefactDetails.getUserId());
         artefact.setCategory(artefactDetails.getCategory());
         artefact.setDescription(artefactDetails.getDescription());
-//        artefact.setLastModifiedDate(new Date());
         final Artefact updatedArtefact = artefactRepository.save(artefact);
         return ResponseEntity.ok(updatedArtefact);
     }

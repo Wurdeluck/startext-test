@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface ArtefactRepository extends JpaRepository<Artefact, UUID> {
-
+    boolean existsByArtefactId(UUID artefactId);
 }

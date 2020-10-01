@@ -12,5 +12,6 @@ import java.util.UUID;
 public interface CommentaryRepository extends JpaRepository<Commentary, UUID> {
 
     Page<Commentary> findByArtefactId(UUID artefactId, Pageable pageable);
+    boolean existsByCommentaryId(UUID commentaryId);
 }
 

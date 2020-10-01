@@ -1,7 +1,6 @@
 package com.example.demo.models;
 // This import helps create tables in database
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -12,23 +11,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static javax.persistence.TemporalType.TIMESTAMP;
-
 // The Artefact class is annotated with @Entity, indicating that it is a JPA entity.
 // @Table annotation exists, this entity is mapped to a table named artefacts.
 @Entity
 @Table(name = "artefacts")
-//@EntityListeners(AuditingEntityListener.class)
-//public class Artefact extends Auditable<String> {
+
 public class Artefact {
     @Id
-//    This should be uncommented, but now for testing purposes
-//    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID artefactId;
 
-    @CreatedDate
-    @Temporal(TIMESTAMP)
-    @Column(name = "created", nullable = false)
+    //    @CreatedDate
+//    @Temporal(TIMESTAMP)
+    @Column(name = "created")
     private Date created;
 
     @Column(name = "userId", nullable = false)
@@ -60,6 +54,9 @@ public class Artefact {
     }
 
     public UUID getArtefactId() {
+        if (artefactId == null) {
+            artefactId = UUID.randomUUID();
+        }
         return artefactId;
     }
 
@@ -99,15 +96,13 @@ public class Artefact {
         this.description = description;
     }
 
-    public Page< Commentary > getCommentaries(Pageable pageable) {
+    public Page<Commentary> getCommentaries(Pageable pageable) {
         int start = (int) pageable.getOffset();
         int end = (Math.min((start + pageable.getPageSize()), commentaries.size()));
-        Page<Commentary> page
-                = new PageImpl<Commentary>(commentaries.subList(start, end), pageable, commentaries.size());
-        return page;
+        return new PageImpl<>(commentaries.subList(start, end), pageable, commentaries.size());
     }
 
-    public void setCommentaries(List < Commentary > commentaries) {
+    public void setCommentaries(List<Commentary> commentaries) {
         this.commentaries = commentaries;
     }
 
