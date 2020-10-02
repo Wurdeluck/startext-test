@@ -91,7 +91,7 @@ public class ArtefactControllerIntegrationTest {
     }
 
     @Test
-    public void getAllArtefacts_ifNull() throws Exception {
+    public void getAllArtefacts_EmptyDb() throws Exception {
         mvc.perform(get("/api/v1/artefacts")
                 .with(user(TEST_USER_ID))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -213,23 +213,23 @@ public class ArtefactControllerIntegrationTest {
 
         artefactRepository.saveAndFlush(apple);
 
-        Artefact banana = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 09:16:38.951"), "1", "Food", "Yellow and squishy");
+        Artefact newApple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 09:16:38.951"), "1", "Food", "Yellow and squishy");
 
         mvc.perform(put("/api/v1/artefacts/{id}", "9dffcb25-b76f-448f-b966-72c41b40c7f7")
                 .with(user(TEST_USER_ID))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.toJson(banana)))
+                .content(JsonUtil.toJson(newApple)))
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         List<Artefact> found = artefactRepository.findAll();
         assertThat(found).extracting(Artefact::getArtefactId).containsOnly(apple.getArtefactId());
-        assertThat(found).extracting(Artefact::getDescription).containsOnly(banana.getDescription());
+        assertThat(found).extracting(Artefact::getDescription).containsOnly(newApple.getDescription());
         resetDb();
     }
 
     @Test
-    public void updateArtefact_ArtefactExist() throws IOException, Exception {
+    public void updateArtefact_NoArtefactException() throws IOException, Exception {
         Artefact apple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 08:15:37.951"), "1", "Food", "Red and delicious");
         mvc.perform(put("/api/v1/artefacts/{id}", "9dffcb25-b76f-448f-b966-72c41b40c7f7")
                 .with(user(TEST_USER_ID))
@@ -243,7 +243,7 @@ public class ArtefactControllerIntegrationTest {
     }
 
     @Test
-    public void updateArtefact_UpdateUnmodifiedField() throws IOException, Exception {
+    public void updateArtefact_UpdateNonModifiedField() throws IOException, Exception {
         Artefact apple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 08:15:37.951"), "1", "Food", "Red and delicious");
         artefactRepository.saveAndFlush(apple);
         Artefact newApple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("9999-09-29 09:19:39.999"), "1", "Food", "Red and delicious");
@@ -276,7 +276,7 @@ public class ArtefactControllerIntegrationTest {
     }
 
     @Test
-    public void deleteArtefact_ArtefactExist() throws Exception {
+    public void deleteArtefact_NoArtefactException() throws Exception {
 
         mvc.perform(delete("/api/v1/artefacts/{id}", "9dffcb25-b76f-448f-b966-72c41b40c7f7")
                 .with(user(TEST_USER_ID)))

@@ -1,7 +1,6 @@
 package com.example.demo.controllers;
 
 import com.example.demo.models.Artefact;
-import com.example.demo.models.Commentary;
 import com.example.demo.repository.ArtefactRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -39,12 +38,12 @@ class ArtefactControllerUnitTest {
 //    public void setUp() throws Exception {
 //    }
     private final static String TEST_USER_ID = "user-id-123";
-    Artefact apple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 08:15:37.951"), "1", "Food", "Red and delicious");
-    Artefact banana = new Artefact(UUID.fromString("085c8b83-a7d0-4549-9e83-3dc3cd1b7850"), Timestamp.valueOf("2020-09-25 09:16:38.951"), "1", "Food", "Yellow and squishy");
-    List<Artefact> allArtefacts = Arrays.asList(apple, banana);
-    Commentary comment_apple = new Commentary(UUID.fromString("8e8b05bc-aa0a-4a34-a95f-bb1212b5dde0"), UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), "1", "Not so bad");
-    Commentary comment_banana = new Commentary(UUID.fromString("14367c2e-f153-4ba9-9879-95613b575033"), UUID.fromString("085c8b83-a7d0-4549-9e83-3dc3cd1b7850"), "1", "Not so bad");
-    List<Commentary> allCommentaries = Arrays.asList(comment_apple, comment_banana);
+//    Artefact apple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 08:15:37.951"), "1", "Food", "Red and delicious");
+//    Artefact banana = new Artefact(UUID.fromString("085c8b83-a7d0-4549-9e83-3dc3cd1b7850"), Timestamp.valueOf("2020-09-25 09:16:38.951"), "1", "Food", "Yellow and squishy");
+//    List<Artefact> allArtefacts = Arrays.asList(apple, banana);
+//    Commentary comment_apple = new Commentary(UUID.fromString("8e8b05bc-aa0a-4a34-a95f-bb1212b5dde0"), UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), "1", "Not so bad");
+//    Commentary comment_banana = new Commentary(UUID.fromString("14367c2e-f153-4ba9-9879-95613b575033"), UUID.fromString("085c8b83-a7d0-4549-9e83-3dc3cd1b7850"), "1", "Not so bad");
+//    List<Commentary> allCommentaries = Arrays.asList(comment_apple, comment_banana);
 
     @Test
     void getAllArtefacts() throws Exception {
