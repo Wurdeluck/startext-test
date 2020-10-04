@@ -4,9 +4,13 @@ import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.models.Artefact;
 import com.example.demo.models.Commentary;
 import com.example.demo.repository.ArtefactRepository;
+import com.example.demo.specifications.ArtefactSpecificationBuilder;
+import com.example.demo.util.SearchOperation;
+import com.sipios.springsearch.anotation.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +20,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @RestController
@@ -25,10 +31,28 @@ public class ArtefactController {
     @Autowired
     private ArtefactRepository artefactRepository;
 
+//
+//    @GetMapping("/artefacts")
+//    public Page<Artefact> getAllArtefacts(Pageable pageable) {
+//        return artefactRepository.findAll(pageable);
+//    }
 
     @GetMapping("/artefacts")
-    public Page<Artefact> getAllArtefacts(Pageable pageable) {
-        return artefactRepository.findAll(pageable);
+    public Page<Artefact> search(@RequestParam(value = "search", required = false) String search, Pageable pageable) {
+        ArtefactSpecificationBuilder builder = new ArtefactSpecificationBuilder();
+        String operationSetExper = String.join("|", SearchOperation.SIMPLE_OPERATION_SET);
+        Pattern pattern = Pattern.compile("(\\w+?)(" + operationSetExper + ")(\\p{Punct}?)(\\w+?)(\\p{Punct}?),");
+        Matcher matcher = pattern.matcher(search + ",");
+        while (matcher.find()) {
+            builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
+        }
+        Specification<Artefact> spec = builder.build();
+        return artefactRepository.findAll(spec, pageable);
+    }
+
+    @GetMapping("/artefacts_alternative")
+    public Page<Artefact> search(@SearchSpec Specification<Artefact> specs, Pageable pageable) {
+        return artefactRepository.findAll(Specification.where(specs), pageable);
     }
 
     @GetMapping("/artefacts/{id}/commentaries")

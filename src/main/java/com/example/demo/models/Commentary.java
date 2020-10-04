@@ -20,20 +20,21 @@ public class Commentary {
     @Column(name = "artefactId", nullable = false)
     private UUID artefactId;
 
-//    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Artefact.class)
-//    @JoinColumn(name = "artefactId", referencedColumnName = "artefactId", nullable = false)
-//    private Artefact artefact;
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Artefact.class)
+    @JoinColumn(name = "artefactId", nullable = false)
+    private Artefact artefact;
 
 
     public Commentary() {
 
     }
 
-    public Commentary(UUID commentaryId, UUID artefactId, String userId, String content) {
+//    public Commentary(UUID commentaryId, UUID artefactId, String userId, String content) {
+    public Commentary(UUID commentaryId, String userId, String content) {
         this.commentaryId = commentaryId;
         this.userId = userId;
         this.content = content;
-        this.artefactId = artefactId;
+//        this.artefactId = artefactId;
     }
 
     public UUID getCommentaryId() {
@@ -63,13 +64,13 @@ public class Commentary {
         this.content = content;
     }
 
-    public UUID getArtefactId() {
-        return artefactId;
-    }
-
-    public void setArtefactId(UUID artefactId) {
-        this.artefactId = artefactId;
-    }
+//    public UUID getArtefactId() {
+//        return artefactId;
+//    }
+//
+//    public void setArtefactId(UUID artefactId) {
+//        this.artefactId = artefactId;
+//    }
 
     //    @Override
 //    public boolean equals(Object o) {

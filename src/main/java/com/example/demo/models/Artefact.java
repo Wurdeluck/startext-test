@@ -6,7 +6,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -35,9 +34,9 @@ public class Artefact {
     private String description;
 
     //    @OneToMany(mappedBy = "artefact", fetch=FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "artefactId", referencedColumnName = "artefactId")
-    private List<Commentary> commentaries = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="artefact")
+//    @JoinColumn(name = "artefactId", referencedColumnName = "artefactId")
+    private List<Commentary> commentaries;
 
 
     //  The default constructor exists only for the sake of JPA. You do not use it directly, so it is designated as protected

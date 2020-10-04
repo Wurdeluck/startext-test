@@ -104,13 +104,111 @@ public class ArtefactControllerIntegrationTest {
     }
 
     @Test
+    public void getAllArtefacts_SingleParamSearch() throws IOException, Exception {
+        Artefact apple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 08:15:37.951"), "1", "Food", "Red and delicious");
+        Artefact banana = new Artefact(UUID.fromString("085c8b83-a7d0-4549-9e83-3dc3cd1b7850"), Timestamp.valueOf("2020-09-25 09:16:38.951"), "1", "Washing", "Yellow and squishy");
+
+        artefactRepository.saveAndFlush(apple);
+        artefactRepository.saveAndFlush(banana);
+
+        mvc.perform(get("/api/v1/artefacts")
+                .with(user(TEST_USER_ID))
+                .param("search", "category:Washing")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$['content']", hasSize(greaterThanOrEqualTo(1))))
+                .andExpect(jsonPath("$['content'][0].artefactId", is("085c8b83-a7d0-4549-9e83-3dc3cd1b7850")));
+
+        resetDb();
+    }
+
+    @Test
+    public void getAllArtefacts_PartitionParamSearch() throws IOException, Exception {
+        Artefact apple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 08:15:37.951"), "1", "Food", "Red and delicious");
+        Artefact banana = new Artefact(UUID.fromString("085c8b83-a7d0-4549-9e83-3dc3cd1b7850"), Timestamp.valueOf("2020-09-25 09:16:38.951"), "1", "Washing", "Yellow and squishy");
+
+        artefactRepository.saveAndFlush(apple);
+        artefactRepository.saveAndFlush(banana);
+
+        mvc.perform(get("/api/v1/artefacts")
+                .with(user(TEST_USER_ID))
+                .param("search", "description:*squi*")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$['content']", hasSize(greaterThanOrEqualTo(1))))
+                .andExpect(jsonPath("$['content'][0].artefactId", is("085c8b83-a7d0-4549-9e83-3dc3cd1b7850")));
+
+        resetDb();
+    }
+
+    @Test
+    public void getAllArtefacts_MultipleParamsSearch() throws IOException, Exception {
+        Artefact apple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 08:15:37.951"), "1", "Food", "Red and delicious");
+        Artefact banana = new Artefact(UUID.fromString("085c8b83-a7d0-4549-9e83-3dc3cd1b7850"), Timestamp.valueOf("2020-09-25 09:16:38.951"), "1", "Washing", "Yellow and squishy");
+        Artefact pear = new Artefact(UUID.fromString("eb2810c2-831b-43db-b441-934f69815a61"), Timestamp.valueOf("2020-09-25 10:16:00.952"), "1", "Food", "Green and juicy");
+
+        artefactRepository.saveAndFlush(apple);
+        artefactRepository.saveAndFlush(banana);
+        artefactRepository.saveAndFlush(pear);
+
+        mvc.perform(get("/api/v1/artefacts")
+                .with(user(TEST_USER_ID))
+                .param("search", "userId:1,category:Food")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$['content']", hasSize(greaterThanOrEqualTo(2))))
+                .andExpect(jsonPath("$['content'][0].artefactId", is("9dffcb25-b76f-448f-b966-72c41b40c7f7")))
+                .andExpect(jsonPath("$['content'][1].artefactId", is("eb2810c2-831b-43db-b441-934f69815a61")));
+
+        resetDb();
+    }
+
+
+    @Test
+    public void getAllArtefacts_ByCommentarySearch() throws IOException, Exception {
+        Artefact apple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 08:15:37.951"), "1", "Food", "Red and delicious");
+        Artefact banana = new Artefact(UUID.fromString("085c8b83-a7d0-4549-9e83-3dc3cd1b7850"), Timestamp.valueOf("2020-09-25 09:16:38.951"), "1", "Washing", "Yellow and squishy");
+
+        Commentary appleComment = new Commentary(UUID.fromString("8e8b05bc-aa0a-4a34-a95f-bb1212b5dde0"), UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), "1", "Not so bad");
+        Commentary bananaComment = new Commentary(UUID.fromString("14367c2e-f153-4ba9-9879-95613b575033"), UUID.fromString("085c8b83-a7d0-4549-9e83-3dc3cd1b7850"), "2", "Like");
+        List<Commentary> appleCommentaries = Arrays.asList(appleComment);
+        List<Commentary> bananaCommentaries = Arrays.asList(bananaComment);
+
+        apple.setCommentaries(appleCommentaries);
+        banana.setCommentaries(bananaCommentaries);
+
+        artefactRepository.saveAndFlush(apple);
+        artefactRepository.saveAndFlush(banana);
+
+
+        mvc.perform(get("/api/v1/artefacts")
+                .with(user(TEST_USER_ID))
+                .param("search", "YourMomma:Not so bad")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$['content']", hasSize(greaterThanOrEqualTo(1))))
+                .andExpect(jsonPath("$['content'][0].artefactId", is("9dffcb25-b76f-448f-b966-72c41b40c7f7")));
+
+//        resetDb();
+    }
+
+    @Test
     public void getCommentariesByArtefactId() throws Exception {
         Artefact apple = new Artefact(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), Timestamp.valueOf("2020-09-25 08:15:37.951"), "1", "Food", "Red and delicious");
         Commentary comment_1 = new Commentary(UUID.fromString("8e8b05bc-aa0a-4a34-a95f-bb1212b5dde0"), UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), "1", "Not so bad");
         Commentary comment_2 = new Commentary(UUID.fromString("14367c2e-f153-4ba9-9879-95613b575033"), UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"), "2", "Like");
         List<Commentary> allCommentaries = Arrays.asList(comment_1, comment_2);
         apple.setCommentaries(allCommentaries);
-        artefactRepository.saveAndFlush(apple);
+        artefactRepository.save(apple);
+        artefactRepository.flush();
 
         mvc.perform(get("/api/v1/artefacts/{id}/commentaries", "9dffcb25-b76f-448f-b966-72c41b40c7f7")
                 .with(user(TEST_USER_ID))
@@ -122,7 +220,12 @@ public class ArtefactControllerIntegrationTest {
                 .andExpect(jsonPath("$['content'][0].commentaryId", is("8e8b05bc-aa0a-4a34-a95f-bb1212b5dde0")))
                 .andExpect(jsonPath("$['content'][1].commentaryId", is("14367c2e-f153-4ba9-9879-95613b575033")));
 
-        resetDb();
+//        Why can't I reset DB?
+//        Code below works, there is surely something in a DB. Why "ArtefactID can't be null" error?
+//        List<Artefact> foundAll = artefactRepository.findAll();
+//        assertThat(foundAll).hasSize(1).extracting(Artefact::getArtefactId).containsOnly(apple.getArtefactId());
+//        artefactRepository.deleteById(UUID.fromString("9dffcb25-b76f-448f-b966-72c41b40c7f7"));
+//        resetDb();
 
     }
 
